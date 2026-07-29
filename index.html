@@ -1,23 +1,628 @@
-@media print {
-  @page {
-    size: A4 portrait;
-    margin: 0;
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Générateur de CV</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f5f3ee;
+    --panel:#ffffff;
+    --ink:#211f1c;
+    --ink-soft:#6b6558;
+    --line:#dcd7cb;
+    --accent:#1f3a5f;
+    --accent-soft:#e7ecf2;
+    --seal:#a63d40;
+    --seal-soft:#f5e6e3;
+    font-size:16px;
   }
-  body {
-    background: #ffffff;
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
   }
-  body * {
-    visibility: hidden;
+
+  /* ---------- header ---------- */
+  .topbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:22px clamp(20px,4vw,56px);
+    border-bottom:1px solid var(--line);
   }
-  .sheet, .sheet * {
-    visibility: visible;
+  .brand{
+    display:flex;
+    align-items:baseline;
+    gap:10px;
   }
-  .sheet {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    box-shadow: none;
-    border-radius: 0;
+  .brand .mark{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    letter-spacing:.14em;
+    color:var(--seal);
+    border:1px solid var(--seal);
+    padding:2px 7px;
+    border-radius:3px;
   }
-}
+  .brand h1{
+    font-family:'Fraunces',serif;
+    font-size:20px;
+    font-weight:600;
+    margin:0;
+    letter-spacing:-.01em;
+  }
+  .topbar p{
+    margin:0;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    color:var(--ink-soft);
+  }
+
+  /* ---------- layout ---------- */
+  .stage{
+    display:grid;
+    grid-template-columns:minmax(320px,420px) 1fr;
+    gap:0;
+    min-height:calc(100vh - 73px);
+    position:relative;
+  }
+  .stage::after{
+    content:"";
+    position:absolute;
+    left:420px;
+    top:0;
+    bottom:0;
+    width:0;
+    border-left:1px dashed var(--line);
+  }
+  @media (max-width:960px){
+    .stage{grid-template-columns:1fr;}
+    .stage::after{display:none;}
+  }
+
+  /* ---------- form column ---------- */
+  .form-col{
+    padding:clamp(20px,3vw,40px);
+    padding-right:clamp(28px,4vw,48px);
+  }
+  .tabs{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    margin-bottom:22px;
+  }
+  .tab{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11.5px;
+    letter-spacing:.03em;
+    padding:6px 10px;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-bottom:2px solid var(--line);
+    border-radius:5px 5px 0 0;
+    color:var(--ink-soft);
+    cursor:default;
+    transition:border-color .2s, color .2s;
+  }
+  .tab.filled{
+    color:var(--accent);
+    border-bottom-color:var(--accent);
+  }
+
+  fieldset{
+    border:none;
+    margin:0 0 22px 0;
+    padding:0;
+  }
+  .field{margin-bottom:16px;}
+  .field label{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11.5px;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    margin-bottom:7px;
+  }
+  .field label .req{color:var(--seal);}
+  .field input,
+  .field textarea{
+    width:100%;
+    font-family:'Inter',sans-serif;
+    font-size:14.5px;
+    color:var(--ink);
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:10px 12px;
+    resize:vertical;
+    transition:border-color .15s, box-shadow .15s;
+  }
+  .field textarea{min-height:78px; line-height:1.5;}
+  .field input:focus,
+  .field textarea:focus{
+    outline:none;
+    border-color:var(--accent);
+    box-shadow:0 0 0 3px var(--accent-soft);
+  }
+  .field .hint{
+    font-size:11.5px;
+    color:var(--ink-soft);
+    margin-top:5px;
+  }
+  .row2{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+  }
+  @media (max-width:520px){.row2{grid-template-columns:1fr;}}
+
+  .generate-btn{
+    width:100%;
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:15px;
+    color:#fff;
+    background:var(--accent);
+    border:none;
+    border-radius:7px;
+    padding:14px 18px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:9px;
+    transition:transform .12s ease, background .15s ease;
+    letter-spacing:.01em;
+  }
+  .generate-btn:hover{background:#183054;}
+  .generate-btn:active{transform:scale(.985);}
+  .generate-btn svg{width:16px;height:16px;}
+
+  .status-line{
+    margin-top:10px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11.5px;
+    color:var(--ink-soft);
+    text-align:center;
+    min-height:16px;
+  }
+
+  /* ---------- preview column ---------- */
+  .preview-col{
+    padding:clamp(24px,3vw,44px);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+  .preview-toolbar{
+    width:100%;
+    max-width:680px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:16px;
+  }
+  .preview-toolbar .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+  }
+  .icon-btn{
+    font-family:'Inter',sans-serif;
+    font-size:12.5px;
+    font-weight:600;
+    color:var(--accent);
+    background:var(--accent-soft);
+    border:1px solid transparent;
+    border-radius:6px;
+    padding:7px 13px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    transition:opacity .15s;
+  }
+  .icon-btn:disabled{opacity:.4; cursor:not-allowed;}
+  .icon-btn:not(:disabled):hover{opacity:.82;}
+
+  .sheet-wrap{
+    width:100%;
+    max-width:680px;
+    position:relative;
+  }
+
+  .sheet{
+    background:var(--panel);
+    border-radius:3px;
+    box-shadow:0 1px 2px rgba(30,25,15,.06), 0 18px 40px -18px rgba(30,25,15,.28);
+    min-height:640px;
+    position:relative;
+    overflow:hidden;
+    opacity:0;
+    transform:translateY(10px);
+  }
+  .sheet.shown{
+    animation:rise .5s cubic-bezier(.2,.7,.2,1) forwards;
+  }
+  @keyframes rise{
+    to{opacity:1; transform:translateY(0);}
+  }
+
+  .seal{
+    position:absolute;
+    top:26px;
+    right:26px;
+    width:52px;
+    height:52px;
+    border-radius:50%;
+    border:1.5px solid var(--seal);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:15px;
+    color:var(--seal);
+    letter-spacing:.02em;
+    transform:rotate(-6deg);
+  }
+  .seal::before{
+    content:"";
+    position:absolute;
+    inset:-6px;
+    border-radius:50%;
+    border:1px dotted var(--seal);
+    opacity:.55;
+  }
+
+  .cv-head{
+    background:var(--accent-soft);
+    padding:38px 40px 30px 40px;
+    border-bottom:3px solid var(--accent);
+  }
+  .cv-name{
+    font-family:'Fraunces',serif;
+    font-size:clamp(26px,4vw,34px);
+    font-weight:700;
+    margin:0 0 6px 0;
+    letter-spacing:-.01em;
+    color:var(--ink);
+    padding-right:70px;
+  }
+  .cv-contact{
+    display:flex;
+    flex-wrap:wrap;
+    gap:4px 18px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12.5px;
+    color:var(--accent);
+  }
+  .cv-contact span{display:flex; align-items:center; gap:6px;}
+  .cv-contact .dot{width:4px;height:4px;border-radius:50%;background:var(--accent); opacity:.5;}
+
+  .cv-body{padding:30px 40px 40px 40px;}
+  .cv-section{margin-bottom:26px;}
+  .cv-section:last-child{margin-bottom:0;}
+  .cv-section h3{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11.5px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--seal);
+    margin:0 0 12px 0;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .cv-section h3::after{
+    content:"";
+    flex:1;
+    height:1px;
+    background:var(--line);
+  }
+  .cv-section .body-text{
+    font-size:14px;
+    line-height:1.65;
+    color:var(--ink);
+    white-space:pre-line;
+  }
+  .pill-group{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  .pill{
+    font-family:'Inter',sans-serif;
+    font-size:12.5px;
+    font-weight:500;
+    color:var(--accent);
+    background:var(--accent-soft);
+    border-radius:20px;
+    padding:5px 13px;
+  }
+  .pill.lang{
+    color:var(--seal);
+    background:var(--seal-soft);
+  }
+
+  .empty-state{
+    min-height:640px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:14px;
+    text-align:center;
+    padding:40px;
+    border:1px dashed var(--line);
+    border-radius:6px;
+    background:var(--panel);
+  }
+  .empty-state svg{width:34px;height:34px;color:var(--line);}
+  .empty-state p{
+    margin:0;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12.5px;
+    color:var(--ink-soft);
+    max-width:280px;
+    line-height:1.6;
+  }
+
+  @media print{
+    body *{visibility:hidden;}
+    .sheet, .sheet *{visibility:visible;}
+    .sheet{position:absolute; top:0; left:0; box-shadow:none; width:100%;}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <span class="mark">CV·01</span>
+    <h1>Générateur de CV</h1>
+  </div>
+  <p>Formulaire → document</p>
+</div>
+
+<div class="stage">
+
+  <!-- ============ COLONNE FORMULAIRE ============ -->
+  <div class="form-col">
+    <div class="tabs" id="tabs">
+      <div class="tab" data-tab="identite">Identité</div>
+      <div class="tab" data-tab="formation">Formation</div>
+      <div class="tab" data-tab="experience">Expérience</div>
+      <div class="tab" data-tab="competences">Compétences</div>
+      <div class="tab" data-tab="langues">Langues</div>
+    </div>
+
+    <form id="cvForm">
+      <fieldset>
+        <div class="field">
+          <label>Nom et prénom <span class="req">*</span></label>
+          <input type="text" id="nom" placeholder="Ex. : Amina Koffi" autocomplete="name">
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label>Téléphone</label>
+            <input type="tel" id="telephone" placeholder="+229 01 XX XX XX XX" autocomplete="tel">
+          </div>
+          <div class="field">
+            <label>Email</label>
+            <input type="email" id="email" placeholder="nom@exemple.com" autocomplete="email">
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <div class="field">
+          <label>Formation</label>
+          <textarea id="formation" placeholder="Ex. : Licence en Gestion — Université d'Abomey-Calavi, 2022"></textarea>
+          <div class="hint">Une formation par ligne, de la plus récente à la plus ancienne.</div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <div class="field">
+          <label>Expérience</label>
+          <textarea id="experience" placeholder="Ex. : Assistante commerciale — Société Alpha, 2023 – aujourd'hui"></textarea>
+          <div class="hint">Une expérience par ligne, de la plus récente à la plus ancienne.</div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <div class="field">
+          <label>Compétences</label>
+          <input type="text" id="competences" placeholder="Ex. : Excel, Gestion de projet, Photoshop">
+          <div class="hint">Séparez chaque compétence par une virgule.</div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <div class="field">
+          <label>Langues</label>
+          <input type="text" id="langues" placeholder="Ex. : Français (courant), Anglais (intermédiaire)">
+          <div class="hint">Séparez chaque langue par une virgule.</div>
+        </div>
+      </fieldset>
+
+      <button type="submit" class="generate-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6M12 16v6M4.9 4.9l4.2 4.2M14.9 14.9l4.2 4.2M2 12h6M16 12h6M4.9 19.1l4.2-4.2M14.9 9.1l4.2-4.2"/></svg>
+        Générer mon CV
+      </button>
+      <div class="status-line" id="statusLine">Remplissez le formulaire, puis générez votre CV.</div>
+    </form>
+  </div>
+
+  <!-- ============ COLONNE APERÇU ============ -->
+  <div class="preview-col">
+    <div class="preview-toolbar">
+      <span class="eyebrow">Aperçu du document</span>
+      <button class="icon-btn" id="printBtn" disabled>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M6 14h12v8H6z"/></svg>
+        Télécharger en PDF
+      </button>
+    </div>
+
+    <div class="sheet-wrap">
+      <div class="empty-state" id="emptyState">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h6M9 9h1"/></svg>
+        <p>Votre CV apparaîtra ici, prêt à être imprimé ou enregistré en PDF, dès que vous cliquerez sur « Générer mon CV ».</p>
+      </div>
+
+      <div class="sheet" id="sheet" style="display:none;">
+        <div class="seal" id="seal">--</div>
+        <div class="cv-head">
+          <h2 class="cv-name" id="outNom">—</h2>
+          <div class="cv-contact">
+            <span id="outTel"></span>
+            <span class="dot" id="dotSep"></span>
+            <span id="outEmail"></span>
+          </div>
+        </div>
+        <div class="cv-body">
+          <div class="cv-section" id="secFormation">
+            <h3>Formation</h3>
+            <div class="body-text" id="outFormation"></div>
+          </div>
+          <div class="cv-section" id="secExperience">
+            <h3>Expérience</h3>
+            <div class="body-text" id="outExperience"></div>
+          </div>
+          <div class="cv-section" id="secCompetences">
+            <h3>Compétences</h3>
+            <div class="pill-group" id="outCompetences"></div>
+          </div>
+          <div class="cv-section" id="secLangues">
+            <h3>Langues</h3>
+            <div class="pill-group" id="outLangues"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const ids = ['nom','telephone','email','formation','experience','competences','langues'];
+  const fields = {};
+  ids.forEach(id => fields[id] = document.getElementById(id));
+
+  const tabMap = {
+    identite: ['nom','telephone','email'],
+    formation: ['formation'],
+    experience: ['experience'],
+    competences: ['competences'],
+    langues: ['langues']
+  };
+
+  function updateTabs(){
+    document.querySelectorAll('.tab').forEach(tab=>{
+      const key = tab.dataset.tab;
+      const filled = tabMap[key].some(id => fields[id].value.trim().length > 0);
+      tab.classList.toggle('filled', filled);
+    });
+  }
+
+  ids.forEach(id => fields[id].addEventListener('input', updateTabs));
+  updateTabs();
+
+  function initials(name){
+    const parts = name.trim().split(/\s+/).filter(Boolean);
+    if(parts.length === 0) return '--';
+    if(parts.length === 1) return parts[0].slice(0,2).toUpperCase();
+    return (parts[0][0] + parts[parts.length-1][0]).toUpperCase();
+  }
+
+  function linesToHTML(text){
+    return text.split('\n').map(l => l.trim()).filter(Boolean).join('\n');
+  }
+
+  function pillsFrom(text, extraClass){
+    return text.split(',')
+      .map(s => s.trim())
+      .filter(Boolean)
+      .map(s => `<span class="pill${extraClass ? ' '+extraClass : ''}">${escapeHTML(s)}</span>`)
+      .join('');
+  }
+
+  function escapeHTML(str){
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  function toggleSection(sectionEl, hasContent){
+    sectionEl.style.display = hasContent ? '' : 'none';
+  }
+
+  const sheet = document.getElementById('sheet');
+  const emptyState = document.getElementById('emptyState');
+  const printBtn = document.getElementById('printBtn');
+  const statusLine = document.getElementById('statusLine');
+
+  document.getElementById('cvForm').addEventListener('submit', function(e){
+    e.preventDefault();
+
+    const nom = fields.nom.value.trim();
+    if(!nom){
+      statusLine.textContent = 'Indiquez au moins votre nom et prénom pour générer le CV.';
+      fields.nom.focus();
+      return;
+    }
+
+    document.getElementById('outNom').textContent = nom;
+    document.getElementById('seal').textContent = initials(nom);
+
+    const tel = fields.telephone.value.trim();
+    const email = fields.email.value.trim();
+    document.getElementById('outTel').textContent = tel;
+    document.getElementById('outEmail').textContent = email;
+    document.getElementById('dotSep').style.display = (tel && email) ? '' : 'none';
+
+    const formation = linesToHTML(fields.formation.value);
+    document.getElementById('outFormation').textContent = formation;
+    toggleSection(document.getElementById('secFormation'), formation.length > 0);
+
+    const experience = linesToHTML(fields.experience.value);
+    document.getElementById('outExperience').textContent = experience;
+    toggleSection(document.getElementById('secExperience'), experience.length > 0);
+
+    const competences = fields.competences.value.trim();
+    document.getElementById('outCompetences').innerHTML = pillsFrom(competences);
+    toggleSection(document.getElementById('secCompetences'), competences.length > 0);
+
+    const langues = fields.langues.value.trim();
+    document.getElementById('outLangues').innerHTML = pillsFrom(langues, 'lang');
+    toggleSection(document.getElementById('secLangues'), langues.length > 0);
+
+    emptyState.style.display = 'none';
+    sheet.style.display = 'block';
+    sheet.classList.remove('shown');
+    void sheet.offsetWidth;
+    sheet.classList.add('shown');
+
+    printBtn.disabled = false;
+    statusLine.textContent = 'CV généré. Vous pouvez le télécharger en PDF.';
+  });
+
+  printBtn.addEventListener('click', function(){
+    window.print();
+  });
+</script>
+
+</body>
+</html>
