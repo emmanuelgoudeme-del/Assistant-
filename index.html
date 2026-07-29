@@ -1,0 +1,23 @@
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  body {
+    background: #ffffff;
+  }
+  body * {
+    visibility: hidden;
+  }
+  .sheet, .sheet * {
+    visibility: visible;
+  }
+  .sheet {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    box-shadow: none;
+    border-radius: 0;
+  }
+}
